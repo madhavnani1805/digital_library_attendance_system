@@ -1,0 +1,302 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your QR Code</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-image: url('/4.jpg'); /* Set your image URL here */
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      backdrop-filter: blur(10px);
+      max-width: 5000px;
+      max-height: 5000px;
+      margin: auto;
+      text-align: center;
+      position: relative;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      padding: 40px 20px;
+      min-height: 100vh;
+      box-sizing: border-box;
+      z-index: 1;
+      position: relative;
+    }
+
+    marquee {
+      font-size: 40px;
+      font-weight: bold;
+      padding: 10px;
+    }
+
+    h1 {
+      color: white;
+      margin-top: 20px;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    font {
+      display: block;
+      margin: 10px 0;
+    }
+
+    p {
+      font-weight: bold;
+      text-decoration: underline;
+      color: white;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+
+    #qrcode img {
+      margin-top: 20px;
+      max-width: 90%;
+      height: auto;
+      border: 5px solid white;
+      border-radius: 10px;
+      animation: qrGlow 2s infinite ease-in-out, zoomIn 0.8s ease;
+    }
+
+    .btn-container {
+      margin-top: 30px;
+    }
+
+    button {
+      background-color: #ffffff;
+      border: none;
+      padding: 12px 20px;
+      margin: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      animation: bounce 2s infinite, glowPulse 2s infinite;
+      box-shadow: 0 0 10px #00ffe5, 0 0 20px #00ffe5;
+    }
+
+    button:hover {
+      background-color: #d6d6d6;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 24px;
+      }
+
+      marquee {
+        font-size: 28px;
+      }
+
+      button {
+        width: 80%;
+        font-size: 18px;
+      }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 5px #00ffe5; }
+      50% { box-shadow: 0 0 20px #00ffe5, 0 0 30px #00ffe5; }
+      100% { box-shadow: 0 0 5px #00ffe5; }
+    }
+
+    @keyframes qrGlow {
+      0%, 100% { box-shadow: 0 0 10px #ffffff; }
+      50% { box-shadow: 0 0 30px #00ffcc; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    #audioToggle {
+      position: relative;
+      nav-right: 20px; /* Position at the bottom */
+      nav-right: 20px; /* Position to the left */
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+      border: none;
+      padding: 10px 2px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 10px #00ffe5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" loop autoplay>
+    <source src="https://cdn.pixabay.com/audio/2025/04/18/audio_5cb8df71be.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Firework Sound -->
+  <audio id="fireworkSound">
+    <source src="https://audio-previews.elements.envatousercontent.com/files/479186249/preview.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <button id="audioToggle" onclick="toggleAudio()">🔊 Music </button>
+
+  <hr>
+  <marquee behavior="scroll" direction="left" style="background-color: #0df0ac; color: rgb(226, 42, 42); font-family: impact;">
+    Welcome to the Attendance System
+  </marquee>
+  <hr>
+
+  <h1>Your Attendance QR Code</h1>
+  
+  <font size="5" color="white"><b>Scan This QR Code To Mark Your Attendance.</b></font>
+  <font size="5" color="white"><b>Student Name: <span id="studentName"></span></b></font>
+  <font size="5" color="white"><b>Roll No: <span id="rollNo"></span></b></font>
+  <font size="5" color="white"><b>Branch: <span id="branch"></span></b></font>
+
+  <p><big><b><u>Save or print this QR code for future attendance scans.</u></b></big></p>
+
+  <div id="qrcode"></div>
+  <div id="errorMessage" class="error"></div>
+
+  <div class="btn-container">
+    <button id="downloadBtn" style="display: none;" onclick="launchFirework()">📥 Download QR Code</button>
+    <button id="printBtn" style="display: none;" onclick="launchFirework()">🖨 Print QR Code</button>
+    <button onclick="goToHome(); launchFirework()">👤 Go To Login</button>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name");
+    const rollNo = params.get("rollNo");
+    const branch = params.get("branch");
+
+    if (name && rollNo && branch) {
+      document.getElementById('studentName').innerText = name;
+      document.getElementById('rollNo').innerText = rollNo;
+      document.getElementById('branch').innerText = branch;
+
+      const qrData = { full_name: name, roll_no: rollNo, branch: branch };
+
+      QRCode.toDataURL(JSON.stringify(qrData), function (err, url) {
+        if (err) {
+          console.error(err);
+          document.getElementById('qrcode').innerText = "Error generating QR code. Please try again.";
+        } else {
+          const img = document.createElement('img');
+          img.src = url;
+          img.id = "qrImage";
+          document.getElementById('qrcode').appendChild(img);
+
+          const downloadBtn = document.getElementById('downloadBtn');
+          downloadBtn.style.display = "inline-block";
+          downloadBtn.onclick = function () {
+            launchFirework();
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${name}_${rollNo}_QR.png`;
+            link.click();
+          };
+
+          const printBtn = document.getElementById('printBtn');
+          printBtn.style.display = "inline-block";
+          printBtn.onclick = function () {
+            launchFirework();
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write('<img src="' + url + '" style="width:100%;"/>');
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
+          };
+        }
+      });
+    } else {
+      document.getElementById('studentName').innerText = "N/A";
+      document.getElementById('rollNo').innerText = "N/A";
+      document.getElementById('branch').innerText = "N/A";
+      document.getElementById('errorMessage').innerText = "❌ No student data found in URL. Please check the link.";
+    }
+
+    function goToHome() {
+      window.location.href = "index.html"; // change to your login file path
+    }
+
+    function toggleAudio() {
+      const audio = document.getElementById("bgMusic");
+      const btn = document.getElementById("audioToggle");
+      if (audio.paused) {
+        audio.play();
+        btn.innerText = "🔊 Turn Off";
+      } else {
+        audio.pause();
+        btn.innerText = "🔈 Turn On";
+      }
+    }
+
+    function launchFirework() {
+      const fireSound = document.getElementById("fireworkSound");
+      if (fireSound) {
+        fireSound.currentTime = 0;
+        fireSound.play().catch(err => console.error("Audio playback failed:", err));
+
+        // Automatically stop the sound after 12 seconds
+        setTimeout(() => {
+          fireSound.pause();
+          fireSound.currentTime = 0; // Reset again if needed
+        }, 12000); // 12 seconds = 12000 ms
+      }
+
+      // Trigger confetti
+      if (typeof confetti === "function") {
+        confetti({
+          particleCount: 150,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      } else {
+        console.error("Confetti library is not loaded.");
+      }
+    }
+
+    // Add confetti effect to buttons only once
+    document.querySelectorAll('button').forEach(button => {
+      button.addEventListener('click', () => {
+        if (typeof confetti === "function") {
+          confetti({
+            particleCount: 4000,
+            spread: 3500,
+            origin: { y: 0.6 }
+          });
+        } else {
+          console.error("Confetti library is not loaded.");
+        }
+      });
+    });
+  </script>
+</body>
+</html>

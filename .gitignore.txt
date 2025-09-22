@@ -1,0 +1,9 @@
+# Node / project
+node_modules/
+.env
+*.log
+.DS_Store
+.vscode/
+
+# DB dumps (optional)
+digital_library_full.sql

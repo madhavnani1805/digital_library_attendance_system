@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Panel - Attendance Records</title>
+  <style>
+    :root {
+      --bg-color: #f0f2f5;
+      --card-color: #ffffff;
+      --text-color: #333333;
+      --primary-color: #4f46e5;
+      --button-hover: #4338ca;
+      --shadow-color: rgba(0, 0, 0, 0.05);
+      --border-color: #e0e0e0;
+    }
+    [data-theme="dark"] {
+      --bg-color: #121212;
+      --card-color: #1e1e1e;
+      --text-color: #e0e0e0;
+      --primary-color: #6366f1;
+      --button-hover: #818cf8;
+      --shadow-color: rgba(255, 255, 255, 0.05);
+      --border-color: #333333;
+    }
+
+    body {
+      font-family: 'Poppins', 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: background-color 0.4s, color 0.4s;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--text-color);
+      margin-bottom: 20px;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .buttons-container, .filters-container {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    button, select, input[type="date"], input[type="text"] {
+      background-color: var(--primary-color);
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px var(--shadow-color);
+    }
+
+    button:hover, select:hover, input[type="date"]:hover, input[type="text"]:hover {
+      background-color: var(--button-hover);
+    }
+
+    select, input[type="date"], input[type="text"] {
+      background-color: var(--card-color);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      outline: none;
+    }
+
+    input[type="text"], input[type="date"] {
+      padding: 10px;
+      border-radius: 25px;
+      border: 1px solid #ccc;
+      background-color: var(--card-color);
+      color: var(--text-color);
+      font-size: 16px;
+      width: auto;
+      box-shadow: 0 2px 5px var(--shadow-color);
+      transition: all 0.3s ease;
+    }
+
+    input[type="date"]:focus, input[type="text"]:focus {
+      border-color: var(--primary-color);
+    }
+
+    [data-theme="dark"] select,
+    [data-theme="dark"] input[type="date"] {
+      background-color: var(--card-color);
+      color: var(--text-color);
+    }
+
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 25px;
+    }
+
+    .search-bar input {
+      padding: 12px 18px;
+      border-radius: 25px;
+      width: 320px;
+      border: 1px solid var(--border-color);
+      outline: none;
+      font-size: 16px;
+      background: var(--card-color);
+      color: var(--text-color);
+      transition: border-color 0.3s;
+    }
+
+    .search-bar input:focus {
+      border-color: var(--primary-color);
+    }
+
+    .table-container {
+      background: var(--card-color);
+      padding: 25px;
+      border-radius: 12px;
+      overflow-x: auto;
+      box-shadow: 0 4px 20px var(--shadow-color);
+      flex: 1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-color);
+      font-size: 15px;
+    }
+
+    th {
+      background-color: var(--primary-color);
+      color: white;
+      font-size: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tr:hover {
+      background-color: rgba(99, 102, 241, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tr {
+        background: var(--card-color);
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px var(--shadow-color);
+      }
+      td {
+        text-align: left;
+        padding: 8px 0;
+        position: relative;
+        border-bottom: none;
+      }
+      td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        display: inline-block;
+        width: 130px;
+      }
+    }
+  </style>
+</head>
+<body>
+    <h1>Admin Panel - Attendance Records</h1>
+
+    <div class="buttons-container">
+      <button onclick="toggleTheme()">🌗 Change Mode</button>
+      <button onclick="exportToExcel()">📄 Export Filtered</button>
+      <button onclick="exportBranch()">📄 Export Branch</button>
+    </div>
+  
+    <div class="filters-container">
+      <input type="text" id="fromDate" placeholder="📅 From" onclick="this.type='date';" onblur="if(this.value=='')this.type='text';">
+      <input type="text" id="toDate" placeholder="📅 To" onclick="this.type='date';" onblur="if(this.value=='')this.type='text';">
+      
+      <select id="branchFilter" onchange="handleBranchChange(); filterTable();">
+        <option value="">All Branches</option>
+        <option value="CSE">CSE</option>
+        <option value="AIML">AIML</option>
+        <option value="CS">CS</option>
+        <option value="AI&DS">AI&DS</option>
+        <option value="DS">DS</option>
+        <option value="ECE">ECE</option>
+        <option value="EEE">EEE</option>
+        <option value="MECH">MECH</option>
+        <option value="CIVIL">CIVIL</option>
+      </select>
+    </div>
+  
+    <!-- Sub-branch dynamic radios will render here -->
+    <div class="filters-container" id="subBranchContainer"></div>
+  
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by Roll No, Name, or Branch..." onkeyup="filterTable()">
+    </div>
+  
+    <div class="table-container">
+      <table id="attendanceTable">
+<thead>
+  <tr>
+    <th>Roll Number</th>
+    <th>Full Name</th>
+    <th>Branch</th>
+    <th>Date</th>
+    <th>Time</th>
+  </tr>
+</thead>
+
+        <tbody>
+          <!-- Dynamic rows go here -->
+        </tbody>
+      </table>
+    </div>
+  
+   <script src="https://cdn.sheetjs.com/xlsx-0.19.2/package/dist/xlsx.full.min.js"></script>
+<script>
+  const subBranches = {
+    CSE: ['CSE-A', 'CSE-B', 'CSE-C'],
+    AIML: ['AIML-A', 'AIML-B', 'AIML-C'],
+    CS: ['CS-A', 'CS-B', 'CS-C'],
+    "AI&DS": ['AI&DS-A', 'AI&DS-B', 'AI&DS-C'],
+    DS: ['DS-A', 'DS-B', 'DS-C'],
+    ECE: ['ECE-A', 'ECE-B', 'ECE-C'],
+    EEE: ['EEE-A', 'EEE-B', 'EEE-C'],
+    MECH: ['MECH-A', 'MECH-B', 'MECH-C'],
+    CIVIL: ['CIVIL-A', 'CIVIL-B', 'CIVIL-C']
+  };
+
+  let attendanceData = [];
+  let selectedSubBranch = "";
+
+  function handleBranchChange() {
+    const branch = document.getElementById('branchFilter').value;
+    const container = document.getElementById('subBranchContainer');
+    container.innerHTML = '';
+
+    selectedSubBranch = "";
+    if (subBranches[branch]) {
+      subBranches[branch].forEach(sub => {
+        const label = document.createElement('label');
+        label.style.marginRight = "10px";
+
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'subBranch';
+        radio.value = sub;
+        radio.onclick = () => {
+          selectedSubBranch = sub;
+          filterTable();
+        };
+
+        label.appendChild(radio);
+        label.appendChild(document.createTextNode(' ' + sub));
+        container.appendChild(label);
+      });
+    }
+  }
+
+  function toggleTheme() {
+    const theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'dark') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  }
+
+  fetch('/admin')
+    .then(res => res.json())
+    .then(data => {
+      attendanceData = data;
+      renderTable(attendanceData);
+    })
+    .catch(err => console.error("❌ Error:", err));
+
+  function renderTable(data) {
+    const tbody = document.querySelector('#attendanceTable tbody');
+    tbody.innerHTML = "";
+
+    data.forEach(record => {
+      const tr = document.createElement('tr');
+      const fields = [
+        { label: "Roll Number", value: record.roll_no },
+        { label: "Full Name", value: record.full_name },
+        { label: "Branch", value: record.branch },
+        { label: "Date", value: record.created_at ? new Date(record.created_at).toLocaleDateString("en-GB") : '-' },
+        { label: "Time", value: record.created_at ? new Date(record.created_at).toLocaleTimeString("en-GB") : '-' }
+      ];
+      fields.forEach(field => {
+        const td = document.createElement('td');
+        td.setAttribute('data-label', field.label);
+        td.textContent = field.value;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  function filterTable() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const branch = document.getElementById('branchFilter').value;
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
+
+    const filtered = attendanceData.filter(record => {
+      const searchMatch = record.roll_no.toLowerCase().includes(search) ||
+                          record.full_name.toLowerCase().includes(search) ||
+                          record.branch.toLowerCase().includes(search);
+
+      const branchMatch = branch === "" || record.branch.startsWith(branch);
+      const subBranchMatch = selectedSubBranch === "" || record.branch === selectedSubBranch;
+
+      const createdAt = new Date(record.created_at);
+      const dateMatch = (!fromDate || createdAt >= new Date(fromDate)) &&
+                        (!toDate || createdAt <= new Date(toDate));
+
+      return searchMatch && branchMatch && subBranchMatch && dateMatch;
+    });
+
+    renderTable(filtered);
+  }
+
+  function exportToExcel() {
+    const rows = document.querySelectorAll('#attendanceTable tbody tr');
+    const exportData = [];
+
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      const rowData = Array.from(cells).map(cell => cell.textContent);
+      exportData.push(rowData);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet([
+      ["Roll Number", "Full Name", "Branch", "Date", "Time"],
+      ...exportData
+    ]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+    XLSX.writeFile(wb, "Filtered_Attendance.xlsx");
+  }
+
+  function exportBranch() {
+    const branch = document.getElementById('branchFilter').value;
+    const filteredByBranch = attendanceData.filter(record => branch !== "" && record.branch.startsWith(branch));
+
+    const exportData = filteredByBranch.map(r => ({
+      "Roll Number": r.roll_no,
+      "Full Name": r.full_name,
+      "Branch": r.branch,
+      "Date": r.created_at ? new Date(r.created_at).toLocaleDateString("en-GB") : "-",
+      "Time": r.created_at ? new Date(r.created_at).toLocaleTimeString("en-GB") : "-"
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Branch Records");
+    XLSX.writeFile(wb, `${branch || "All"}_Attendance.xlsx`);
+  }
+</script>
+
+</body>
+</html>

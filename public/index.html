@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Digital Library</title>
+  <style>
+    body {
+  margin: 0;
+  font-family: sans-serif;
+  background-image: url('/3.jpg'); /* Set your image URL here */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  backdrop-filter: blur(10px);
+  /* Optional: Set a fixed size for the body */
+  margin: auto;
+  text-align: center;
+  position: relative;
+  
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  backdrop-filter: blur(8px);
+  padding: 40px 20px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  z-index: 1;
+  position: relative;
+  width: 100%; /* Full width */
+  padding: 20px; /* Adjust padding for smaller screens */
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  backdrop-filter: blur(8px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.6));
+  padding: 20px 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgb(255, 255, 255);
+  margin-bottom: 20px;
+  width: 10;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  padding: 10px;
+  background-color: #00cbe6;
+  box-shadow: 0 0 15px red;
+}
+
+.title {
+  font-family: Impact, sans-serif;
+  color: red;
+  font-size: 2.5rem;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.hidden { display: none; }
+.form-box { 
+  margin-bottom: 20px; 
+  background: rgba(255, 255, 255, 0.8); 
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.6));
+  border-radius: 10px;
+  padding: 40px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+input { 
+  padding: 10px; 
+  margin: 5px; 
+  height: 35px;
+  width: 250px; 
+  border: 3px solid rgb(0, 204, 255);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #ff0000;
+  font-size: 1rem;
+  box-shadow: #fff 0 0 5px rgba(0, 204, 255, 0.5);
+  transition: border-color 0.3s ease-in-out;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+@keyframes glowing {
+  0% {
+    box-shadow: 0 0 10px #00cbe6, 0 0 20px #00cbe6, 0 0 30px #00cbe6;
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    box-shadow: 0 0 10px #000000, 0 0 20px #000000, 0 0 30px #000000;
+    transform: scale(1);
+  }
+}
+
+button {
+  padding: 10px 20px;
+  margin: 5px;
+  border-radius: 8px;
+  border: none;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgb(240, 12, 12);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, transform 0.2s ease;
+  animation: glowing 2.00s infinite alternate;
+}
+
+button:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 25px #00cbe6, 0 0 35px #00cbe6, 0 0 45px #00cbe6;
+  transform: scale(2.00);
+}
+
+button:active {
+  transform: scale(2.00);
+  box-shadow: 0 0 15px #1caff3, 0 0 25px #1caff3, 0 0 35px #1caff3;
+  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+}
+
+#reader {
+  width: 90%;
+  max-width: 300px;
+  aspect-ratio: 1 / 1;
+  margin: auto;
+  border: 2px solid #000000;
+  backdrop-filter: blur(8px);
+  border-radius: 10px;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.scanner-box {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.scanner-box img,
+.scanner-box video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.scan-text {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  color: #51ff00;
+}
+
+.scan-options button {
+  background-color: #fff;
+  color: #00cbe6;
+  box-shadow: 0 2px 6px rgb(255, 0, 0);
+}
+
+.password-container {
+  position: relative;
+  display: inline-block;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 15%;
+  transform: translateY(-30%);
+  cursor: pointer;
+  font-size: 14px;
+  background: none;
+  border: none;
+}
+
+.scan-options {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+  </style>
+</head>
+<body>
+
+  <div class="main-container">
+    <div class="header">
+      <img src="https://img.icons8.com/ios-filled/100/000000/books.png" alt="Library Logo" class="logo" />
+      <div class="title">Digital Library<br>Attendance</div>
+    </div>
+
+    <br> 
+    <hr>
+    <hr>
+
+    <!-- 🔐 Login Form -->
+    <div id="loginForm" class="form-box">
+      <h2>Login</h2>
+      <input type="text" id="loginEmail" placeholder="Email" /><br>
+      <div class="password-container">
+        <input type="password" id="loginPassword" placeholder="Password" />
+        <button type="button" class="toggle-password" onclick="togglePassword('loginPassword', this)">👁</button>
+      </div><br>
+      <button onclick="loginUser()">Login</button>
+      <p>Don't have an account? <a href="#" onclick="toggleForms('register')">Register here</a></p>
+    </div>
+
+    <!-- 📝 Register Form -->
+    <div id="registerForm" class="form-box hidden">
+      <h2>Register</h2>
+      <input type="text" id="full_name" placeholder="Full Name" /><br>
+      <input type="text" id="roll_no" placeholder="Roll No" /><br>
+      <input type="text" id="branch" placeholder="Branch" /><br>
+      <input type="text" id="registerEmail" placeholder="Email" /><br>
+      <div class="password-container">
+        <input type="password" id="regPassword" placeholder="Password" />
+        <button type="button" class="toggle-password" onclick="togglePassword('regPassword', this)">👁</button>
+      </div><br>
+      <div class="password-container">
+        <input type="password" id="confirmPassword" placeholder="Confirm Password" />
+        <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword', this)">👁</button>
+      </div><br>
+      <button onclick="registerUser()">Register</button>
+      <p>Already have an account? <a href="#" onclick="toggleForms('login')">Login here</a></p>
+    </div>
+
+
+    <!-- ✅ Main Attendance Area -->
+    <div id="scannerArea" class="hidden">
+      <font face="Implicit"; color="aqua"> <h1> Scan QR to Mark Attendance </h1> </font>
+   
+      <div class="scan-options">
+        <button onclick="startQRScanner('environment')">📷 Use Back Camera</button>
+        <button onclick="startQRScanner('file')">📂 Select QR from File</button>
+      </div>
+      <div id="reader" class="scanner-box"></div>
+      <div id="result" class="scan-text">Scan a student QR to mark attendance</div>
+      <br>
+      <div style="display: inline-flex; gap: 10px;">
+        <button onclick="logout()">Logout</button>
+        <button onclick="window.location.href='/admin.html'">Admin Panel</button>
+      </div>
+  </div>
+
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script>
+  let html5QrCode;
+
+  function toggleForms(mode) {
+    document.getElementById('loginForm').classList.toggle('hidden', mode !== 'login');
+    document.getElementById('registerForm').classList.toggle('hidden', mode !== 'register');
+  }
+
+  function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    input.type = input.type === "password" ? "text" : "password";
+    btn.textContent = input.type === "password" ? "👁" : "🙈";
+  }
+
+  async function registerUser() {
+  const full_name = document.getElementById('full_name').value.trim();
+  const roll_no = document.getElementById('roll_no').value.trim();
+  const branch = document.getElementById('branch').value.trim();
+  const email = document.getElementById('registerEmail').value.trim();
+  const password = document.getElementById('regPassword').value.trim();
+  const confirm_password = document.getElementById('confirmPassword').value.trim();
+
+  // Check if all required fields are filled
+  if (!full_name || !roll_no || !branch || !email || !password || !confirm_password) {
+    alert("Please fill all fields.");
+    return;
+  }
+
+  // Check if passwords match
+  if (password !== confirm_password) {
+    alert("Passwords do not match.");
+    return;
+  }
+
+  // Proceed with sending data to the backend
+  try {
+    const res = await fetch('/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ full_name, roll_no, branch, email, password })
+    });
+
+    const text = await res.text();
+    if (res.status === 200) {
+      alert("✅ Registered Successfully");
+      window.location.href = `/qr.html?name=${encodeURIComponent(full_name)}&rollNo=${encodeURIComponent(roll_no)}&branch=${encodeURIComponent(branch)}`;
+    } else {
+      alert("❌ " + text);
+    }
+  } catch (err) {
+    alert("❌ Registration failed");
+    console.error(err);
+  }
+}
+
+async function loginUser() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  // Check if email and password are filled
+  if (!email || !password) {
+    alert("Please fill all fields.");
+    return;
+  }
+
+  // Proceed with sending data to the backend
+  try {
+    const res = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const text = await res.text();
+    if (res.status === 200) {
+      alert("✅ Login Successful");
+      document.getElementById('loginForm').classList.add('hidden');
+      document.getElementById('scannerArea').classList.remove('hidden');
+    } else {
+      alert("❌ " + text);
+    }
+  } catch (err) {
+    alert("❌ Login failed");
+    console.error(err);
+  }
+}
+
+  function logout() {
+    location.reload();
+  }
+
+  function startQRScanner(mode) {
+    const readerElement = document.getElementById("reader");
+
+    if (html5QrCode) {
+      try { html5QrCode.stop(); } catch (err) {}
+      html5QrCode.clear();
+    }
+
+    if (mode === "file") {
+      readerElement.innerHTML = "";
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.onchange = function () { handleFile(this); };
+      readerElement.appendChild(input);
+      return;
+    }
+
+    readerElement.innerHTML = "";
+    html5QrCode = new Html5Qrcode("reader");
+
+    html5QrCode.start(
+      { facingMode: mode },
+      {
+        fps: 10,
+        qrbox: function (w, h) {
+          const size = Math.floor(Math.min(w, h) * 0.7);
+          return { width: size, height: size };
+        }
+      },
+      async (decodedText) => {
+        document.getElementById("result").innerText = "✅ Scanned: " + decodedText;
+        await sendAttendance(decodedText);
+        html5QrCode.stop();
+      },
+      (err) => console.warn("Scan error:", err)
+    ).catch(err => {
+      document.getElementById("result").innerText = "❌ Camera access failed. Try another option.";
+      console.error("Camera failed:", err);
+    });
+  }
+
+  function handleFile(input) {
+    if (input.files.length === 0) return;
+    const file = input.files[0];
+    const html5QrCode = new Html5Qrcode("reader");
+
+    html5QrCode.scanFile(file, true).then(decodedText => {
+      document.getElementById("result").innerText = "✅ Scanned from Image: " + decodedText;
+      sendAttendance(decodedText);
+    }).catch(err => {
+      document.getElementById("result").innerText = "❌ QR Scan Failed";
+      console.error(err);
+    });
+  }
+
+  async function sendAttendance(qrData) {
+  let data;
+  try {
+    data = JSON.parse(qrData);
+  } catch (err) {
+    alert("Invalid QR Code Data. It must be JSON with roll_no, full_name, branch.");
+    return;
+  }
+
+  try {
+    const res = await fetch('/mark-attendance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        qrData: JSON.stringify({
+          roll_no: data.roll_no,
+          name:    data.full_name,
+          branch:  data.branch
+        })
+      })
+    });
+
+    const result = await res.json();
+    
+    if (res.ok) {
+      alert(result.message);
+      window.location.href = '/admin.html';   // ✅ Redirect after scan success
+    } else {
+      alert("❌ " + result.message);
+    }
+
+  } catch (error) {
+    console.error('Error sending attendance:', error);
+    alert("❌ Failed to send attendance.");
+  }
+}
+
+</script>
+</body>
+</html>
